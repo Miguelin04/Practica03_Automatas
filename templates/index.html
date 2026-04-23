@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de AFND | Práctica 03</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Vis.js -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <header class="glass-header">
+        <div class="header-content">
+            <h1>Simulador AFND</h1>
+            <p>Práctica 03 - Teoría de Autómatas</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <aside class="sidebar glass-panel">
+            <h2>Ejercicios</h2>
+            <ul class="nav-links">
+                <li class="active" data-target="ids">
+                    <span class="icon">🛡️</span> 
+                    <span>1. Ataque IDS (Ej. 6)</span>
+                </li>
+                <li data-target="ecommerce">
+                    <span class="icon">🛒</span> 
+                    <span>2. E-commerce (Ej. 9)</span>
+                </li>
+                <li data-target="messaging">
+                    <span class="icon">💬</span> 
+                    <span>3. Mensajería (Ej. 10)</span>
+                </li>
+            </ul>
+        </aside>
+
+        <section class="content glass-panel">
+            <div class="exercise-header">
+                <h2 id="exercise-title">Detección de Patrones de Ataque (IDS)</h2>
+                <div class="formal-definition glass-subpanel" id="formal-def">
+                    <!-- Dynamic content here -->
+                </div>
+            </div>
+
+            <div class="workspace">
+                <div class="graph-container glass-subpanel">
+                    <div id="mynetwork"></div>
+                </div>
+
+                <div class="controls-container">
+                    <div class="glass-subpanel input-panel">
+                        <h3>Armar Secuencia de Entrada</h3>
+                        <p class="subtitle">Selecciona los símbolos del alfabeto para crear la cadena:</p>
+                        <div class="symbol-buttons" id="symbol-buttons">
+                            <!-- Dynamic buttons here based on alphabet -->
+                        </div>
+                        
+                        <div class="current-sequence-display">
+                            <div class="sequence-header">Cadena a evaluar:</div>
+                            <div id="sequence-badges" class="badges-container">
+                                <span class="placeholder-text">Vacía</span>
+                            </div>
+                        </div>
+                        
+                        <div class="actions">
+                            <button id="btn-clear" class="btn btn-secondary">Limpiar</button>
+                            <button id="btn-simulate" class="btn btn-primary">Simular AFND</button>
+                        </div>
+                    </div>
+
+                    <div class="results glass-subpanel" id="results" style="display: none;">
+                        <h3>Resultado</h3>
+                        <div id="result-status" class="status-badge"></div>
+                        <p id="result-text"></p>
+                        
+                        <div class="history-controls">
+                            <button id="btn-prev-step" class="btn btn-sm" disabled>Anterior</button>
+                            <span id="step-counter">Paso 0 de 0</span>
+                            <button id="btn-next-step" class="btn btn-sm" disabled>Siguiente</button>
+                        </div>
+                        
+                        <div class="history-container" id="history-container">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
