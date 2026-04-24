@@ -1,84 +1,3 @@
-// Definiciones de los AFNDs
-const nfaConfigs = {
-    ids: {
-        title: "Detección de Patrones de Ataque (IDS)",
-        formal: `
-            <div class="def-item"><strong>Q:</strong> {q0, q1, q2, q3}</div>
-            <div class="def-item"><strong>Σ:</strong> {SYN, ACK, RST, OTHER}</div>
-            <div class="def-item"><strong>q0:</strong> q0</div>
-            <div class="def-item"><strong>F:</strong> {q3}</div>
-            <div class="def-item"><strong>Patrón:</strong> SYN -> ACK(s) -> RST</div>
-        `,
-        alphabet: ['SYN', 'ACK', 'RST', 'OTHER'],
-        nodes: [
-            { id: 'q0', label: 'q0\n(Inicio)', x: -200, y: 0, color: { background: '#1e293b', border: '#3b82f6' }, font: { color: 'white' } },
-            { id: 'q1', label: 'q1\n(SYN)', x: -50, y: 0, color: { background: '#1e293b', border: '#3b82f6' }, font: { color: 'white' } },
-            { id: 'q2', label: 'q2\n(ACK)', x: 100, y: 0, color: { background: '#1e293b', border: '#3b82f6' }, font: { color: 'white' } },
-            { id: 'q3', label: 'q3\n(Aceptado)', x: 250, y: 0, color: { background: '#1e293b', border: '#10b981' }, borderWidth: 3, font: { color: 'white' } }
-        ],
-        edges: [
-            { from: 'q0', to: 'q0', label: 'Σ', selfReferenceSize: 20 },
-            { from: 'q0', to: 'q1', label: 'SYN' },
-            { from: 'q1', to: 'q2', label: 'ACK' },
-            { from: 'q2', to: 'q2', label: 'ACK', selfReferenceSize: 20 },
-            { from: 'q2', to: 'q3', label: 'RST' },
-            { from: 'q3', to: 'q3', label: 'Σ', selfReferenceSize: 20 }
-        ]
-    },
-    ecommerce: {
-        title: "Analizador de Comportamiento (E-commerce)",
-        formal: `
-            <div class="def-item"><strong>Q:</strong> {q0, q1, q2, q3}</div>
-            <div class="def-item"><strong>Σ:</strong> {HOME, SEARCH, CART, OTHER}</div>
-            <div class="def-item"><strong>q0:</strong> q0</div>
-            <div class="def-item"><strong>F:</strong> {q3}</div>
-            <div class="def-item"><strong>Patrón:</strong> HOME -> SEARCH(es) -> CART</div>
-        `,
-        alphabet: ['HOME', 'SEARCH', 'CART', 'OTHER'],
-        nodes: [
-            { id: 'q0', label: 'q0\n(Inicio)', x: -200, y: 0, color: { background: '#1e293b', border: '#8b5cf6' }, font: { color: 'white' } },
-            { id: 'q1', label: 'q1\n(Home)', x: -50, y: 0, color: { background: '#1e293b', border: '#8b5cf6' }, font: { color: 'white' } },
-            { id: 'q2', label: 'q2\n(Search)', x: 100, y: 0, color: { background: '#1e293b', border: '#8b5cf6' }, font: { color: 'white' } },
-            { id: 'q3', label: 'q3\n(Cart)', x: 250, y: 0, color: { background: '#1e293b', border: '#10b981' }, borderWidth: 3, font: { color: 'white' } }
-        ],
-        edges: [
-            { from: 'q0', to: 'q0', label: 'Σ', selfReferenceSize: 20 },
-            { from: 'q0', to: 'q1', label: 'HOME' },
-            { from: 'q1', to: 'q2', label: 'SEARCH' },
-            { from: 'q2', to: 'q2', label: 'SEARCH', selfReferenceSize: 20 },
-            { from: 'q2', to: 'q3', label: 'CART' },
-            { from: 'q3', to: 'q3', label: 'Σ', selfReferenceSize: 20 }
-        ]
-    },
-    messaging: {
-        title: "Validación de Sintaxis de Mensajería",
-        formal: `
-            <div class="def-item"><strong>Q:</strong> {q0, q1, q2, q3, q4}</div>
-            <div class="def-item"><strong>Σ:</strong> {@, TEXT, /, CMD, OTHER}</div>
-            <div class="def-item"><strong>q0:</strong> q0</div>
-            <div class="def-item"><strong>F:</strong> {q2, q4}</div>
-            <div class="def-item"><strong>Patrón:</strong> @USER -> TEXT -> (opcional) /CMD</div>
-        `,
-        alphabet: ['@', 'TEXT', '/', 'CMD', 'OTHER'],
-        nodes: [
-            { id: 'q0', label: 'q0\n(Inicio)', x: -300, y: 0, color: { background: '#1e293b', border: '#f59e0b' }, font: { color: 'white' } },
-            { id: 'q1', label: 'q1\n(@)', x: -150, y: 0, color: { background: '#1e293b', border: '#f59e0b' }, font: { color: 'white' } },
-            { id: 'q2', label: 'q2\n(Texto)', x: 0, y: 0, color: { background: '#1e293b', border: '#10b981' }, borderWidth: 3, font: { color: 'white' } },
-            { id: 'q3', label: 'q3\n(/)', x: 150, y: 0, color: { background: '#1e293b', border: '#f59e0b' }, font: { color: 'white' } },
-            { id: 'q4', label: 'q4\n(Cmd)', x: 300, y: 0, color: { background: '#1e293b', border: '#10b981' }, borderWidth: 3, font: { color: 'white' } }
-        ],
-        edges: [
-            { from: 'q0', to: 'q0', label: 'Σ', selfReferenceSize: 20 },
-            { from: 'q0', to: 'q1', label: '@' },
-            { from: 'q1', to: 'q2', label: 'TEXT' },
-            { from: 'q2', to: 'q2', label: 'OTHER', selfReferenceSize: 20 },
-            { from: 'q2', to: 'q3', label: '/' },
-            { from: 'q3', to: 'q4', label: 'CMD' },
-            { from: 'q4', to: 'q4', label: 'Σ', selfReferenceSize: 20 }
-        ]
-    }
-};
-
 // Estado Global
 let currentNFA = 'ids';
 let currentSequence = [];
@@ -87,6 +6,7 @@ let simulationHistory = [];
 let currentStep = 0;
 let originalNodes = null;
 let originalEdges = null;
+let currentConfig = null;
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,31 +33,81 @@ function initUI() {
     document.getElementById('btn-next-step').addEventListener('click', nextStep);
 }
 
-function loadNFA(nfaId) {
+async function loadNFA(nfaId) {
     currentNFA = nfaId;
-    const config = nfaConfigs[nfaId];
     
-    // Update text and definitions
-    document.getElementById('exercise-title').innerText = config.title;
-    document.getElementById('formal-def').innerHTML = config.formal;
-    
-    // Clear state
-    clearSequence();
-    document.getElementById('results').style.display = 'none';
-    
-    // Create alphabet buttons
-    const btnContainer = document.getElementById('symbol-buttons');
-    btnContainer.innerHTML = '';
-    config.alphabet.forEach(symbol => {
-        const btn = document.createElement('button');
-        btn.className = 'symbol-btn';
-        btn.innerText = symbol;
-        btn.addEventListener('click', () => addSymbol(symbol));
-        btnContainer.appendChild(btn);
-    });
+    try {
+        const response = await fetch(`/api/nfa/${nfaId}`);
+        if (!response.ok) throw new Error("No se pudo cargar el AFND");
+        const config = await response.json();
+        currentConfig = config;
+        
+        // Generar definición formal dinámica
+        const formalHTML = `
+            <div class="def-item"><strong>Q:</strong> {${config.states.join(', ')}}</div>
+            <div class="def-item"><strong>Σ:</strong> {${config.alphabet.join(', ')}}</div>
+            <div class="def-item"><strong>q0:</strong> ${config.start_state}</div>
+            <div class="def-item"><strong>F:</strong> {${config.accept_states.join(', ')}}</div>
+            <div class="def-item"><strong>Patrón:</strong> ${config.pattern}</div>
+            <details class="transition-table">
+                <summary>Ver Tabla de Transiciones (δ)</summary>
+                ${generateTransitionsHTML(config)}
+            </details>
+        `;
 
-    // Draw graph
-    drawGraph(config);
+        // Update text and definitions
+        document.getElementById('exercise-title').innerText = config.title;
+        document.getElementById('formal-def').innerHTML = formalHTML;
+        
+        // Clear state
+        clearSequence();
+        document.getElementById('results').style.display = 'none';
+        
+        // Create alphabet buttons
+        const btnContainer = document.getElementById('symbol-buttons');
+        btnContainer.innerHTML = '';
+        config.alphabet.forEach(symbol => {
+            const btn = document.createElement('button');
+            btn.className = 'symbol-btn';
+            btn.innerText = symbol;
+            btn.addEventListener('click', () => addSymbol(symbol));
+            btnContainer.appendChild(btn);
+        });
+
+        // Draw graph
+        drawGraph(config);
+        
+    } catch (err) {
+        console.error(err);
+        alert("Error cargando configuración dinámica del AFND");
+    }
+}
+
+function generateTransitionsHTML(config) {
+    let html = '<div class="table-responsive"><table class="academic-table">';
+    // Cabecera (Alfabeto)
+    html += '<thead><tr><th></th>';
+    config.alphabet.forEach(sym => {
+        html += `<th>${sym}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    
+    // Cuerpo (Estados y transiciones)
+    config.states.forEach(state => {
+        html += `<tr><th>${state}</th>`;
+        config.alphabet.forEach(sym => {
+            const nextStates = config.transitions[state] && config.transitions[state][sym];
+            if (nextStates && nextStates.length > 0) {
+                html += `<td>{${nextStates.join(', ')}}</td>`;
+            } else {
+                html += `<td>∅</td>`;
+            }
+        });
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    return html;
 }
 
 function drawGraph(config) {
@@ -152,7 +122,15 @@ function drawGraph(config) {
     };
     
     const options = {
-        physics: false, // Static positions for better visualization
+        layout: {
+            hierarchical: {
+                direction: 'LR',
+                sortMethod: 'directed',
+                levelSeparation: 250,
+                nodeSpacing: 150
+            }
+        },
+        physics: false,
         edges: {
             arrows: {
                 to: { enabled: true, scaleFactor: 0.8 }
@@ -168,7 +146,7 @@ function drawGraph(config) {
         },
         interaction: {
             hover: true,
-            zoomView: false,
+            zoomView: true,
             dragView: true
         }
     };
@@ -305,16 +283,16 @@ function nextStep() {
 }
 
 function resetGraphHighlights() {
-    if(!originalNodes) return;
+    if(!originalNodes || !currentConfig) return;
     
     const updates = originalNodes.get().map(node => {
-        // Reset to original color
+        // Find original color
         let origColor = '#1e293b';
         let origBorder = '#3b82f6';
-        if(nfaConfigs[currentNFA].nodes.find(n => n.id === node.id)) {
-            let n = nfaConfigs[currentNFA].nodes.find(n => n.id === node.id);
-            origColor = n.color.background;
-            origBorder = n.color.border;
+        let origNode = currentConfig.nodes.find(n => n.id === node.id);
+        if(origNode) {
+            origColor = origNode.color.background;
+            origBorder = origNode.color.border;
         }
         return {
             id: node.id,

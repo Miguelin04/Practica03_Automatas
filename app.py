@@ -3,7 +3,9 @@ from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
 class NFA:
-    def __init__(self, states, alphabet, transitions, start_state, accept_states):
+    def __init__(self, title, pattern, states, alphabet, transitions, start_state, accept_states):
+        self.title = title
+        self.pattern = pattern
         self.states = states
         self.alphabet = alphabet
         self.transitions = transitions
@@ -43,6 +45,8 @@ class NFA:
 
 # Ejercicio 6: Detección de Patrones de Ataque (SYN -> ACK(s) -> RST)
 nfa_ids = NFA(
+    title="Detección de Patrones de Ataque (IDS)",
+    pattern="SYN -> ACK(s) -> RST",
     states=['q0', 'q1', 'q2', 'q3'],
     alphabet=['SYN', 'ACK', 'RST', 'OTHER'],
     transitions={
@@ -57,32 +61,34 @@ nfa_ids = NFA(
 
 # Ejercicio 9: Analizador de Comportamiento (HOME -> SEARCH(es) -> CART)
 nfa_ecommerce = NFA(
+    title="Analizador de Comportamiento (E-commerce)",
+    pattern="HOME -> SEARCH(es) -> CART",
     states=['q0', 'q1', 'q2', 'q3'],
     alphabet=['HOME', 'SEARCH', 'CART', 'OTHER'],
     transitions={
         'q0': {'HOME': ['q0', 'q1'], 'SEARCH': ['q0'], 'CART': ['q0'], 'OTHER': ['q0']},
-        'q1': {'SEARCH': ['q2']},
-        'q2': {'SEARCH': ['q2'], 'CART': ['q3']},
+        'q1': {'SEARCH': ['q2'], 'OTHER': ['q1']},
+        'q2': {'SEARCH': ['q2'], 'CART': ['q3'], 'OTHER': ['q2']},
         'q3': {'HOME': ['q3'], 'SEARCH': ['q3'], 'CART': ['q3'], 'OTHER': ['q3']}
     },
     start_state='q0',
     accept_states={'q3'}
 )
 
-# Ejercicio 10: Validación de Sintaxis de Mensajería (@USER -> TEXT -> /CMD)
-# We treat @ as mention, TEXT as text, / as command start, CMD as command text
+# Ejercicio 10: Validación de Sintaxis de Mensajería
 nfa_messaging = NFA(
-    states=['q0', 'q1', 'q2', 'q3', 'q4'],
-    alphabet=['@', 'TEXT', '/', 'CMD', 'OTHER'],
+    title="Validación de Sintaxis de Mensajería",
+    pattern="@bot (USER)? (!cmd | ?help)",
+    states=['q0', 'q1', 'q2', 'q3'],
+    alphabet=['@bot', 'USER', '!cmd', '?help', 'OTHER'],
     transitions={
-        'q0': {'@': ['q0', 'q1'], 'TEXT': ['q0'], '/': ['q0'], 'CMD': ['q0'], 'OTHER': ['q0']},
-        'q1': {'TEXT': ['q2']},
-        'q2': {'/': ['q3'], 'OTHER': ['q2'], 'TEXT': ['q2'], '@': ['q2'], 'CMD': ['q2']},
-        'q3': {'CMD': ['q4']},
-        'q4': {'@': ['q4'], 'TEXT': ['q4'], '/': ['q4'], 'CMD': ['q4'], 'OTHER': ['q4']}
+        'q0': {'@bot': ['q0', 'q1'], 'USER': ['q0'], '!cmd': ['q0'], '?help': ['q0'], 'OTHER': ['q0']},
+        'q1': {'USER': ['q2'], '!cmd': ['q3'], '?help': ['q3']},
+        'q2': {'!cmd': ['q3'], '?help': ['q3']},
+        'q3': {'@bot': ['q3'], 'USER': ['q3'], '!cmd': ['q3'], '?help': ['q3'], 'OTHER': ['q3']}
     },
     start_state='q0',
-    accept_states={'q2', 'q4'}
+    accept_states={'q3'}
 )
 
 nfas = {
@@ -108,5 +114,69 @@ def simulate():
     result = nfa.simulate(sequence)
     return jsonify(result)
 
+@app.route('/api/nfa/<nfa_id>', methods=['GET'])
+def get_nfa(nfa_id):
+    if nfa_id not in nfas:
+        return jsonify({'error': 'NFA no encontrado'}), 404
+    nfa = nfas[nfa_id]
+    
+    nodes = []
+    for s in nfa.states:
+        is_start = (s == nfa.start_state)
+        is_accept = (s in nfa.accept_states)
+        
+        color = '#1e293b'
+        # Default border based on NFA ID just for aesthetics
+        border = '#3b82f6' if nfa_id == 'ids' else '#8b5cf6' if nfa_id == 'ecommerce' else '#f59e0b'
+        borderWidth = 1
+        
+        if is_accept:
+            border = '#10b981'
+            borderWidth = 3
+            
+        label_suffix = 'Inicio' if is_start else 'Aceptado' if is_accept else ''
+        node_label = f"{s}\n({label_suffix})" if label_suffix else s
+        
+        nodes.append({
+            'id': s,
+            'label': node_label,
+            'color': {'background': color, 'border': border},
+            'borderWidth': borderWidth,
+            'font': {'color': 'white'}
+        })
+        
+    edges_map = {}
+    for s_from, trans in nfa.transitions.items():
+        for symbol, states_to in trans.items():
+            for s_to in states_to:
+                edge_key = (s_from, s_to)
+                if edge_key not in edges_map:
+                    edges_map[edge_key] = []
+                edges_map[edge_key].append(symbol)
+                
+    edges = []
+    for (s_from, s_to), symbols in edges_map.items():
+        # group symbols with a comma and space instead of newline to avoid vertical overlap
+        label = ", ".join(symbols) if len(symbols) > 1 else symbols[0]
+        edges.append({
+            'from': s_from,
+            'to': s_to,
+            'label': label,
+            'selfReferenceSize': 25 if s_from == s_to else None,
+            'font': {'align': 'horizontal'}
+        })
+        
+    return jsonify({
+        'title': nfa.title,
+        'pattern': nfa.pattern,
+        'states': nfa.states,
+        'alphabet': nfa.alphabet,
+        'start_state': nfa.start_state,
+        'accept_states': list(nfa.accept_states),
+        'transitions': nfa.transitions,
+        'nodes': nodes,
+        'edges': edges
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)
