@@ -126,9 +126,9 @@ body {
 .container {
     display: flex;
     max-width: 1400px;
-    margin: 2rem auto;
+    margin: 1rem auto;
     padding: 0 1rem;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 /* Sidebar */
@@ -176,10 +176,10 @@ body {
 /* Content Area */
 .content {
     flex: 1;
-    padding: 2rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .exercise-header {
@@ -202,14 +202,15 @@ body {
 
 .workspace {
     display: grid;
-    grid-template-columns: 1fr 350px;
+    grid-template-columns: 1fr 300px;
     gap: 1.5rem;
     align-items: start;
 }
 
 /* Vis.js Graph Container */
 .graph-container {
-    height: 500px;
+    height: 380px;
+    width: 100%;
     position: relative;
     padding: 0;
     overflow: hidden;

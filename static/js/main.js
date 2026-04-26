@@ -1,5 +1,5 @@
 // Estado Global
-let currentNFA = 'ids';
+let currentNFA = 'iot';
 let currentSequence = [];
 let network = null;
 let simulationHistory = [];
@@ -11,7 +11,7 @@ let currentConfig = null;
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     initUI();
-    loadNFA('ids');
+    loadNFA('iot');
 });
 
 function initUI() {
@@ -74,8 +74,12 @@ async function loadNFA(nfaId) {
             btnContainer.appendChild(btn);
         });
 
-        // Draw graph
-        drawGraph(config);
+        // Show the network container when an NFA is loaded
+        document.getElementById('mynetwork').style.display = 'block';
+        if (network !== null) {
+            network.destroy();
+            network = null;
+        }
         
     } catch (err) {
         console.error(err);
@@ -96,7 +100,12 @@ function generateTransitionsHTML(config) {
     config.states.forEach(state => {
         html += `<tr><th>${state}</th>`;
         config.alphabet.forEach(sym => {
-            const nextStates = config.transitions[state] && config.transitions[state][sym];
+            let nextStates = config.transitions[state] && config.transitions[state][sym];
+            // Aplicar el fallback de 'OTHER' si el símbolo explícito no existe
+            if (!nextStates && config.transitions[state] && config.transitions[state]['OTHER']) {
+                nextStates = config.transitions[state]['OTHER'];
+            }
+            
             if (nextStates && nextStates.length > 0) {
                 html += `<td>{${nextStates.join(', ')}}</td>`;
             } else {
@@ -126,23 +135,23 @@ function drawGraph(config) {
             hierarchical: {
                 direction: 'LR',
                 sortMethod: 'directed',
-                levelSeparation: 250,
-                nodeSpacing: 150
+                levelSeparation: 200,
+                nodeSpacing: 100
             }
         },
         physics: false,
         edges: {
             arrows: {
-                to: { enabled: true, scaleFactor: 0.8 }
+                to: { enabled: true, scaleFactor: 1.2 }
             },
             color: { color: 'rgba(255,255,255,0.4)', highlight: '#3b82f6' },
-            font: { color: 'white', size: 12, background: 'rgba(15,23,42,0.8)', strokeWidth: 0 },
+            font: { color: 'white', size: 16, background: 'rgba(15,23,42,0.8)', strokeWidth: 0 },
             smooth: { type: 'curvedCW', roundness: 0.2 }
         },
         nodes: {
             shape: 'circle',
-            margin: 15,
-            font: { face: 'Outfit', size: 14 }
+            margin: 22,
+            font: { face: 'Outfit', size: 18, bold: true }
         },
         interaction: {
             hover: true,
@@ -169,7 +178,11 @@ function clearSequence() {
     currentSequence = [];
     updateSequenceDisplay();
     document.getElementById('results').style.display = 'none';
-    resetGraphHighlights();
+    document.getElementById('mynetwork').style.display = 'none';
+    if (network !== null) {
+        network.destroy();
+        network = null;
+    }
 }
 
 function updateSequenceDisplay() {
@@ -211,6 +224,10 @@ async function runSimulation() {
         });
 
         const data = await response.json();
+        
+        // Generar diagrama aquí, una vez se evalúa la cadena
+        document.getElementById('mynetwork').style.display = 'block';
+        drawGraph(currentConfig);
         
         simulationHistory = data.history;
         currentStep = 0;
